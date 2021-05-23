@@ -2,7 +2,7 @@
  
  Helps to load data from XML or CSV
  
-#Installation
+# Installation
 Require this package in your `composer.json` and update composer.
  
 ```php
