@@ -1,5 +1,5 @@
 {
-  "name": "kdzone/oc-import-processor",
+  "name": "kdz1/oc-import-processor",
   "description": "Helps to load data from XML or CSV",
   "license": "GPL-3.0",
   "keywords": [
@@ -14,7 +14,7 @@
       "email": "kdzoneru@gmail.com"
     }
   ],
-  "version": "1.0.1",
+  "version": "1.0.2",
   "require": {
     "php": ">=7.3"
   },
