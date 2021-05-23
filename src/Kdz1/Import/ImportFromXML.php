@@ -63,10 +63,25 @@ class ImportFromXML
     {
         $arData = [];
         foreach ($arFields as $fn => $fobj) {
-            $xpath = array_get($fobj, 'xpath');
-            $arData[$fn] = $this->getXmlValue($node, $xpath);
+            $arData[$fn] = $this->getFldValue($node, $fobj);
         }
         return $arData;
+    }
+
+
+    /**
+     * @param \SimpleXMLElement $node
+     * @param $fobj
+     * @return string|null
+     */
+    private function getFldValue(\SimpleXMLElement $node, $fobj)
+    {
+        $xpath = array_get($fobj, 'xpath');
+        if ($xpath) {
+            return $this->getXmlValue($node, $xpath);
+        }
+
+        return array_get($fobj, 'value', null);
     }
 
     /**
@@ -74,9 +89,10 @@ class ImportFromXML
      * @param string $xpath
      * @return string|null
      */
-    private function getXmlValue(\SimpleXMLElement $node, string $xpath) {
+    private function getXmlValue(\SimpleXMLElement $node, string $xpath)
+    {
         $arNodeList = $node->xpath($xpath);
-        return !empty($arNodeList) && (count($arNodeList) > 0) ? (string) $arNodeList[0] : null;
+        return !empty($arNodeList) && (count($arNodeList) > 0) ? (string)$arNodeList[0] : null;
     }
 
 }
