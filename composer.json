@@ -1,0 +1,29 @@
+{
+  "name": "kdzone/oc-import-processor",
+  "description": "Helps to load data from XML or CSV",
+  "license": "GPL-3.0",
+  "keywords": [
+    "php",
+    "OctoberCMS",
+    "model",
+    "import"
+  ],
+  "authors": [
+    {
+      "name": "Kdz1",
+      "email": "kdzoneru@gmail.com"
+    }
+  ],
+  "version": "1.0.1",
+  "require": {
+    "php": ">=7.3"
+  },
+  "autoload": {
+    "classmap": [
+      "src/Kdz1/Import"
+    ],
+    "psr-0": {
+      "Kdz1\\Import\\": "src/"
+    }
+  }
+}
