@@ -2,11 +2,13 @@
  
  Helps to load data from XML or CSV
  
-# Installation
+## Installation
 Require this package in your `composer.json` and update composer.
  
 ```php
-
 "kdzone/oc-import-processor": "1.*"
-
 ```
+
+## Tricks
+
+Can use `$obModel->wasRecentlyCreated` to check insert mode.

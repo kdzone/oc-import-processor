@@ -48,6 +48,7 @@ class ImportModel extends ImportProcessor
     protected function afterImportModel($obModel): void
     {
         // nothinhg
+        // Can use $obModel->wasRecentlyCreated to check insert mode
     }
 
 
