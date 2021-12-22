@@ -7,7 +7,6 @@ use Yaml;
  */
 class ImportModel extends ImportProcessor
 {
-
     protected $modelClass;
     protected $key;
 
@@ -20,7 +19,15 @@ class ImportModel extends ImportProcessor
 
     public function importRec($arValues): void
     {
-        $model = $this->modelClass::where($this->key, $arValues[$this->key])->first();
+        $arKeys = explode(';', $this->key);
+
+        $q = $this->modelClass::query();
+        foreach ($arKeys as $k) {
+            $q->where($k, $arValues[$k]);
+        }
+
+        $model = $q->first();
+
         if ($model) {
             $model->fill($arValues);
             $this->incUpdatedCount();
@@ -32,23 +39,11 @@ class ImportModel extends ImportProcessor
         $model->save();
 
         $this->afterImportModel($model);
-/*
-        $this->output->writeln($arValues['name']);
-        $this->output->writeln($model->name);
-        $this->output->writeln('==');
-
-     //   $this->output->writeln(implode(';', array_values($arValues)));
-
-        if ($this->getProcessedCount() == 29) {
-            $this->bCancel = true;
-        }
-*/
     }
 
     protected function afterImportModel($obModel): void
     {
         // nothinhg
-        // Can use $obModel->wasRecentlyCreated to check insert mode
     }
 
 

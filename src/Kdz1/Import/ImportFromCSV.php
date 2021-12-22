@@ -56,6 +56,8 @@ class ImportFromCSV
 
         $this->initFields(array_get($options, 'fields'));
 
+        $arInitialValues = array_get($arConfig, 'initial-values');
+
         $bHeaderProcessed = false;
         foreach ($reader as $row) {
 
@@ -63,13 +65,22 @@ class ImportFromCSV
                 $map = array_get($arConfig, 'fields-map');
                 if (!empty($map)) {
                     $this->initFieldsByMap($row, $map);
-                    // $output->writeln(implode(';', $this->arFields));
                 }
                 $bHeaderProcessed = true;
                 continue;
             }
 
+            // get record values
             $arRec = $this->getRecValues($row);
+
+            // init record values
+            if ($arInitialValues) {
+                foreach ($arInitialValues as $k => $v) {
+                    $arRec[$k] = $v;
+                }
+            }
+
+            // import
             $obProcessor->importRec($arRec);
 
             $obProcessor->incProcessedCount();
@@ -78,18 +89,16 @@ class ImportFromCSV
                 break;
             }
         }
-        // $output->writeln('== ' . $this->obProcessor->dataFile);
-        // $output->writeln('== count ' . count($arList));
     }
 
 
     /**
-     * @param string|null $names
+     * @param array|string|null $names
      */
-    private function initFields(?string $names)
+    private function initFields($names)
     {
         if (!empty($names)) {
-            $this->arFields = explode(';', $names);
+            $this->arFields = is_array($names) ?: explode(';', $names);
         }
     }
 
