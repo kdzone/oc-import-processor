@@ -1,7 +1,5 @@
 <?php namespace Kdz1\Import;
 
-use Yaml;
-
 /**
  * Class ImportProcessor
  */
@@ -26,16 +24,16 @@ abstract class ImportProcessor
 
     /**
      * ImportProcessor constructor.
-     * @param string $configFile
+     * @param array $arConfig
      */
-    public function __construct(string $configFile)
+    public function __construct(array $arConfig)
     {
-        $this->arConfig = Yaml::parseFile($configFile);
+        $this->arConfig = $arConfig;
     }
 
     /**
      * Get created count
-     * @return int
+     * @return array
      */
     public function getConfig()
     {

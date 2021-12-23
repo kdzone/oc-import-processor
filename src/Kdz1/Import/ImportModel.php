@@ -10,9 +10,9 @@ class ImportModel extends ImportProcessor
     protected $modelClass;
     protected $key;
 
-    public function __construct(string $configFile)
+    public function __construct(array $arConfig)
     {
-        parent::__construct($configFile);
+        parent::__construct($arConfig);
         $this->modelClass = array_get($this->getConfig(), 'modelClass');
         $this->key = array_get($this->getConfig(), 'key', 'id');
     }

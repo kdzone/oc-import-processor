@@ -14,7 +14,7 @@
       "email": "kdzoneru@gmail.com"
     }
   ],
-  "version": "1.0.5",
+  "version": "1.0.6",
   "require": {
     "php": ">=7.3"
   },
