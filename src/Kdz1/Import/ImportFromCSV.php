@@ -39,6 +39,8 @@ class ImportFromCSV
 
         $delimeter = array_get($options, 'delimiter');
         if (!empty($delimeter)) {
+            // !!! должно быть проще
+            $delimeter = array_get(['\t' => "\t"], $delimeter, $delimeter);
             $reader->setDelimiter($delimeter);
         }
 
@@ -54,7 +56,7 @@ class ImportFromCSV
             ));
         }
 
-        $this->initFields(array_get($options, 'fields'));
+        $this->initFields(array_get($arConfig, 'csv-header'));
 
         $arInitialValues = array_get($arConfig, 'initial-values');
 
@@ -98,7 +100,7 @@ class ImportFromCSV
     private function initFields($names)
     {
         if (!empty($names)) {
-            $this->arFields = is_array($names) ?: explode(';', $names);
+            $this->arFields = is_array($names) ? $names: explode(';', $names);
         }
     }
 
