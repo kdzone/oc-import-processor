@@ -1,5 +1,6 @@
 <?php namespace Kdz1\Import;
 
+use ApplicationException;
 use Yaml;
 use League\Csv\Reader as CsvReader;
 use Backend\Behaviors\ImportExportController\TranscodeFilter;
@@ -12,7 +13,8 @@ class ImportFromCSV
 {
 
     protected $obProcessor;
-    protected $arFields = [];
+    protected $arColumns = [];
+    protected $arFieldDefs = [];
 
     /**
      * ImportFromCSV constructor.
@@ -44,8 +46,6 @@ class ImportFromCSV
             $reader->setDelimiter($delimeter);
         }
 
-        $header = array_get($options, 'header', true);
-
         $encoding = array_get($options, 'encoding');
         if (!empty($encoding) && $reader->supportsStreamFilter()) {
             $reader->addStreamFilter(sprintf(
@@ -56,31 +56,32 @@ class ImportFromCSV
             ));
         }
 
-        $this->initFields(array_get($arConfig, 'csv-header'));
-
-        $arInitialValues = array_get($arConfig, 'initial-values');
+        $this->arFieldDefs = $arConfig['field-defs'];
 
         $bHeaderProcessed = false;
+        $bHeader = array_get($options, 'header', true);
         foreach ($reader as $row) {
 
-            if ($header && !$bHeaderProcessed) {
-                $map = array_get($arConfig, 'fields-map');
-                if (!empty($map)) {
-                    $this->initFieldsByMap($row, $map);
+            if (!$bHeaderProcessed) {
+                $arHeader = array_get($arConfig, 'csv-header', null);
+                if (is_null($arHeader)) {
+                    if (!$bHeader) {
+                        throw new ApplicationException('Header expected!');
+                    }
+                    $arHeader = $row;
                 }
+
+                $this->initColumns($arHeader);
+
                 $bHeaderProcessed = true;
-                continue;
+
+                if ($bHeader) {
+                    continue;
+                }
             }
 
             // get record values
             $arRec = $this->getRecValues($row);
-
-            // init record values
-            if ($arInitialValues) {
-                foreach ($arInitialValues as $k => $v) {
-                    $arRec[$k] = $v;
-                }
-            }
 
             // import
             $obProcessor->importRec($arRec);
@@ -95,24 +96,17 @@ class ImportFromCSV
 
 
     /**
-     * @param array|string|null $names
+     * @param array
      */
-    private function initFields($names)
+    private function initColumns($arHeader)
     {
-        if (!empty($names)) {
-            $this->arFields = is_array($names) ? $names: explode(';', $names);
-        }
-    }
-
-    /**
-     * @param $arHeaderNames
-     * @param $arMap
-     */
-    private function initFieldsByMap($arHeaderNames, $arMap)
-    {
-        $this->arFields = [];
-        foreach ($arHeaderNames as $name) {
-            $this->arFields[] = array_get($arMap, $name, '');
+        $this->arColumns = [];
+        $count = count($arHeader);
+        for ($i = 0; $i < $count; $i++) {
+            $k = $arHeader[$i];
+            if ($k) {
+                $this->arColumns[$k] = $i;
+            }
         }
     }
 
@@ -123,17 +117,60 @@ class ImportFromCSV
     private function getRecValues($row)
     {
         $arData = [];
-        $rowCount = count($row);
-        for ($i = 0; $i < $rowCount; $i++) {
-            $k = $this->arFields[$i];
-            if (!empty($k)) {
+        foreach ($this->arFieldDefs as $k => $def) {
+            $v = null;
+
+            $column = array_get($def, 'column');
+            if ($column) {
+                $i = $this->arColumns[$column];
                 $v = $row[$i];
-                if ($v != '') {
-                    array_set($arData, $k, $v);
+            } else {
+                $i = array_get($this->arColumns, $k);
+                if (!is_null($i)) {
+                    $v = $row[$i];
                 }
             }
+
+            $script = array_get($def, 'eval');
+            if ($script) {
+                $v = $this->doEval($script, $this->getRowWithKeys($row));
+            }
+
+            if (is_null($v)) {
+                $v = array_get($def, 'default', null);
+            }
+
+            if (!is_null($v) && ($v !== '')) {
+                array_set($arData, $k, $v);
+            }
+
         }
+
         return $arData;
+    }
+
+    /**
+     * @param $row
+     * @return array
+     */
+    private function getRowWithKeys(array $row)
+    {
+        $arr = [];
+        foreach ($this->arColumns as $column => $idx) {
+            $arr[$column] = $row[$idx];
+        }
+        return $arr;
+    }
+
+    /**
+     * @param $script
+     * @param $rec
+     * @return mixed
+     */
+    private function doEval(string $script, array $row)
+    {
+        // !!! $row в контексте
+        return eval($script);
     }
 
 }
