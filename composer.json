@@ -14,9 +14,9 @@
       "email": "kdzoneru@gmail.com"
     }
   ],
-  "version": "1.0.8",
+  "version": "1.0.9",
   "require": {
-    "php": ">=7.3"
+    "php": ">=7.4"
   },
   "autoload": {
     "classmap": [

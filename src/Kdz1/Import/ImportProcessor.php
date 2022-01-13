@@ -9,15 +9,15 @@ abstract class ImportProcessor
     const DATA_FORMAT_XML = 'xml';
     const DATA_FORMAT_CSV = 'csv';
 
-    protected $arConfig = [];
+    protected array $arConfig = [];
 
-    protected $bCancel = false;
-    protected $iProcessedCount = 0;
-    protected $iCreatedCount = 0;
-    protected $iUpdatedCount = 0;
+    protected bool $bCancel = false;
+    protected int $iProcessedCount = 0;
+    protected int $iCreatedCount = 0;
+    protected int $iUpdatedCount = 0;
 
-    public $dataFormat = self::DATA_FORMAT_XML;
-    public $dataFile = null;
+    public string $dataFormat = self::DATA_FORMAT_XML;
+    public ?string $dataFile = null;
 
     public $progressBar = null;
     public $output = null;
@@ -35,7 +35,7 @@ abstract class ImportProcessor
      * Get created count
      * @return array
      */
-    public function getConfig()
+    public function getConfig(): array
     {
         return $this->arConfig;
     }
@@ -43,7 +43,7 @@ abstract class ImportProcessor
     /**
      * @return bool
      */
-    public function getCancel()
+    public function getCancel(): bool
     {
         return $this->bCancel;
     }
@@ -52,7 +52,7 @@ abstract class ImportProcessor
      * Get processed count
      * @return int
      */
-    public function getProcessedCount()
+    public function getProcessedCount(): int
     {
         return $this->iProcessedCount;
     }
@@ -73,7 +73,7 @@ abstract class ImportProcessor
      * Get created count
      * @return int
      */
-    public function getCreatedCount()
+    public function getCreatedCount(): int
     {
         return $this->iCreatedCount;
     }
@@ -90,7 +90,7 @@ abstract class ImportProcessor
      * Get updated count
      * @return int
      */
-    public function getUpdatedCount()
+    public function getUpdatedCount(): int
     {
         return $this->iUpdatedCount;
     }
@@ -108,6 +108,7 @@ abstract class ImportProcessor
      */
     public function run(): void
     {
+        /** @noinspection DuplicatedCode */
         $this->iProcessedCount = 0;
         $this->iCreatedCount = 0;
         $this->iUpdatedCount = 0;
@@ -119,6 +120,10 @@ abstract class ImportProcessor
             default:
                 $obImport = new ImportFromXML($this);
         endswitch;
+
+        if (!empty($this->progressBar)) {
+            $this->progressBar->start(0);
+        }
 
         $obImport->run();
 
